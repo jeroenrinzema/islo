@@ -1,0 +1,26 @@
+{
+  "name": "islo",
+  "version": "0.1.0",
+  "description": "Run modules in a sandbox environment",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeroenrinzema/islo.git"
+  },
+  "keywords": [
+    "sandbox",
+    "isolated",
+    "environment",
+    "secure",
+    "module",
+    "require"
+  ],
+  "author": "Jeroen Rinzema",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jeroenrinzema/islo/issues"
+  },
+  "homepage": "https://github.com/jeroenrinzema/islo#readme"
+}
