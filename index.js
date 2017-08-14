@@ -26,7 +26,7 @@ module.exports = class Sandbox {
     this.blacklist = options.blacklist || []
     this.tests = {
       pathUsesParent: /^\.\./,
-      isNotPath: /^\w+/
+      isPath: /^(?![\.|\/]).*/
     }
 
     this.middleware = {
@@ -75,7 +75,7 @@ module.exports = class Sandbox {
     // Checks if module is unsafe
     const isOutsideOfRoot = this.tests.pathUsesParent.test(relativePath)
     const isBlacklisted = this.blacklist.indexOf(module) >= 0
-    const isNotPath = this.tests.isNotPath.test(module)
+    const isPath = this.tests.isPath.test(module)
 
     let isUnsafe = isBlacklisted || isOutsideOfRoot
 
@@ -84,7 +84,7 @@ module.exports = class Sandbox {
       const isSafe = middleware.isSafe.call(this, module, {
         isOutsideOfRoot,
         isBlacklisted,
-        isNotPath
+        isPath
       })
 
       isUnsafe = isSafe === undefined ? isUnsafe : !isSafe
@@ -102,7 +102,7 @@ module.exports = class Sandbox {
       }
     }
 
-    if (isNotPath) {
+    if (!isPath) {
       return this.originalRequire.call(sandbox, module)
     }
 
