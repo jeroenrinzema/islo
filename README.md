@@ -1,4 +1,4 @@
-[![N|Solid](https://jeroen.no/islo_logo.png)](Islo)
+[![N|Solid](https://jeroen.no/github/islo_logo.png)](Islo)
 
 # Islo 🚧
 
