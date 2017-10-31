@@ -43,7 +43,7 @@ Create a new sandbox environment for the given module. By default is the module 
 - `eventName` _(String)_
 - `callback` _(Function)_
 
-Register a new handler for the given event.
+Register a new handler for the given event. The callback function is called when the event is fired.
 
 ---
 
