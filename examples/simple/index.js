@@ -6,3 +6,4 @@ box.on('error', function (error) {
 })
 
 box.run()
+box.exports()
