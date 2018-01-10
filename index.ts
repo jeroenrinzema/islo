@@ -168,7 +168,7 @@ export default class Sandbox {
 
     return box.exports
   }
-  on (event: string, callback: Array<any>) {
+  on (event: string, callback: Function) {
     this._emitter.on.call(this._emitter, event, callback)
   }
   emit (event: string, ...args: Array<any>) {
