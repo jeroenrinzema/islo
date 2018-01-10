@@ -1,8 +1,9 @@
 {
   "name": "islo",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Run modules in a sandbox environment",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {},
   "repository": {
     "type": "git",
