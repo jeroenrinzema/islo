@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const EventEmitter = require("events");
 const Module = require("module");
-class Sandbox {
+module.exports = class Sandbox {
     /**
      * This class isolates the given module by creating a sandbox.
      * The sandbox does not allow modules to require files outside of it's root.
@@ -120,5 +120,4 @@ class Sandbox {
     emit(event, ...args) {
         this._emitter.emit(event, ...args);
     }
-}
-exports.default = Sandbox;
+};
