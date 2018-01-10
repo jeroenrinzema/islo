@@ -65,6 +65,6 @@ export default class Sandbox {
      * @return {Object}           The exported object that the module returns.
      */
     wrap(_module: string, Module?: Module): any;
-    on(event: string, callback: Array<any>): void;
+    on(event: string, callback: Function): void;
     emit(event: string, ...args: Array<any>): void;
 }
