@@ -16,7 +16,7 @@ export interface SandboxOptions {
   }
 }
 
-module.exports = class Sandbox {
+export default class Sandbox {
   blacklist: Array<string>
 
   tests: {
