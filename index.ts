@@ -1,13 +1,50 @@
-const path = require('path')
-const Events = require('events')
-const Module = require('module')
+import * as path from 'path'
+import * as EventEmitter from 'events'
+import Module = require('module')
+
+export interface ExtendedModule extends Module {
+  load: Function
+}
+
+export interface SandboxOptions {
+  root?: string
+  blacklist?: Array<string>
+  parent?: NodeModule['parent']
+  middleware?: {
+    isSafe?: Function,
+    require?: Function
+  }
+}
 
 module.exports = class Sandbox {
+  blacklist: Array<string>
+
+  tests: {
+    pathUsesParent: RegExp,
+    isPath: RegExp
+  }
+
+  middleware: {
+    isSafe: Function | undefined,
+    require: Function | undefined
+  }
+
+  parent: NodeModule['parent']
+  file: string
+  root: string
+
+  _emitter: EventEmitter
+
+  originalRequire: NodeRequireFunction
+  box: Module
+
+  exports: any
+
   /**
    * This class isolates the given module by creating a sandbox.
    * The sandbox does not allow modules to require files outside of it's root.
    * A blacklist can be given to reject certain modules.
-   * @param  {String}   module                      Path/name of the module.
+   * @param  {String}   _module                     Path/name of the module.
    * @param  {Object}   options                     These options are used for the sandbox configuration.
    * @param  {String}   options.root                Path to the root folder of the given module. By default is the file directory of the module used.
    * @param  {Array}    options.blacklist           If the module tries to require one of the given strings will a error be thrown.
@@ -15,13 +52,14 @@ module.exports = class Sandbox {
    * @param  {Function} options.middleware.require  This middleware function is called when requiring a module. This function can return a custom variable/module. If a module should be wrapped inside of a sandbox could the 'wrap' method inside the scope be used. If nothing is returned is the function ignored.
    * @return {Sandbox}                              The sandbox class.
    */
-  constructor (module, options = {}) {
+  constructor (_module: string, options: SandboxOptions = {}) {
     if (!options.middleware) {
       options.middleware = {}
     }
 
-    const parent = options.parent || module.parent
-    const file = Module._resolveFilename(module, parent)
+    const parent: NodeModule['parent'] = options.parent || module.parent
+    // Typescript thinks _resolveFilename does not exists
+    const file = (<any>Module)._resolveFilename(_module, parent)
 
     this.blacklist = options.blacklist || []
     this.tests = {
@@ -36,9 +74,9 @@ module.exports = class Sandbox {
 
     this.parent = parent
     this.file = file
-    this.root = options.root || path.dirname(module)
+    this.root = options.root || path.dirname(file)
 
-    this._emitter = new Events.EventEmitter()
+    this._emitter = new EventEmitter()
   }
   /**
    * Require the initialized module and run it inside of a sandbox.
@@ -46,12 +84,14 @@ module.exports = class Sandbox {
    */
   run () {
     try {
-      const sandbox = new Module(this.file, this.parent)
+      // The node types for Module are not 100% accurate
+      const sandbox = <ExtendedModule>new Module(this.file, <Module>this.parent)
 
       this.originalRequire = sandbox.require
       this.box = sandbox
 
       sandbox.require = this.require.bind(this)
+      // Typescript thinks load does not exists on a Module
       sandbox.load(sandbox.id)
 
       this.exports = sandbox.exports
@@ -67,21 +107,21 @@ module.exports = class Sandbox {
    * @param  {String} module Path/name of module.
    * @return {Object}        The exported object that the module returns.
    */
-  require (module) {
+  require (_module: string) {
     const sandbox = this.box
-    const relativePath = path.relative(this.root, module)
+    const relativePath = path.relative(this.root, _module)
     const middleware = this.middleware
 
     // Checks if module is unsafe
     const isOutsideOfRoot = this.tests.pathUsesParent.test(relativePath)
-    const isBlacklisted = this.blacklist.indexOf(module) >= 0
-    const isPath = this.tests.isPath.test(module)
+    const isBlacklisted = this.blacklist.indexOf(_module) >= 0
+    const isPath = this.tests.isPath.test(_module)
 
     let isUnsafe = isBlacklisted || isOutsideOfRoot
 
     if (middleware.isSafe) {
       // If middleware returns true mark module as safe
-      const isSafe = middleware.isSafe.call(this, module, {
+      const isSafe = middleware.isSafe.call(this, _module, {
         isOutsideOfRoot,
         isBlacklisted,
         isPath
@@ -91,11 +131,11 @@ module.exports = class Sandbox {
     }
 
     if (isUnsafe) {
-      throw new Error(`you are not allowed to require the module: '${module}'`)
+      throw new Error(`you are not allowed to require the module: '${_module}'`)
     }
 
     if (middleware.require) {
-      const required = middleware.require.call(this, module)
+      const required = middleware.require.call(this, _module)
 
       if (required) {
         return required
@@ -103,21 +143,21 @@ module.exports = class Sandbox {
     }
 
     if (!isPath) {
-      return this.originalRequire.call(sandbox, module)
+      return this.originalRequire.call(sandbox, _module)
     }
 
-    const innerBox = this.wrap(module, sandbox)
+    const innerBox = this.wrap(_module, sandbox)
     return innerBox
   }
   /**
    * Create a sandbox wrapper around the given module.
    * The configuration of the instance is used for the sandbox creation.
-   * @param  {String} module    Path/name of module.
+   * @param  {String} _module   Path/name of module.
    * @param  {Module} Module    The module of which parent should be used. By default is the initialized Module used.
    * @return {Object}           The exported object that the module returns.
    */
-  wrap (module, Module = this.box) {
-    const box = new Sandbox(module, {
+  wrap (_module: string, Module = this.box) {
+    const box = new Sandbox(_module, {
       root: this.root,
       blacklist: this.blacklist,
       parent: Module.parent,
@@ -128,10 +168,10 @@ module.exports = class Sandbox {
 
     return box.exports
   }
-  on (event, callback) {
+  on (event: string, callback: Array<any>) {
     this._emitter.on.call(this._emitter, event, callback)
   }
-  emit (event, ...args) {
+  emit (event: string, ...args: Array<any>) {
     this._emitter.emit(event, ...args)
   }
 }

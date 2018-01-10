@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "description": "Run modules in a sandbox environment",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jeroenrinzema/islo.git"
@@ -22,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/jeroenrinzema/islo/issues"
   },
-  "homepage": "https://github.com/jeroenrinzema/islo#readme"
+  "homepage": "https://github.com/jeroenrinzema/islo#readme",
+  "devDependencies": {
+    "@types/node": "^9.3.0"
+  }
 }

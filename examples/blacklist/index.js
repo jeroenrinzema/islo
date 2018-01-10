@@ -1,4 +1,4 @@
-const Sandbox = require('../../')
+const Sandbox = require('../../dist')
 
 const box = new Sandbox('./module', {
   blacklist: ['fs']
