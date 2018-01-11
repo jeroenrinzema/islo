@@ -64,7 +64,7 @@ export default class Sandbox {
     this.blacklist = options.blacklist || []
     this.tests = {
       pathUsesParent: /^\.\./,
-      isPath: /^(?![\.|\/]).*/
+      isPath: /^([\.|\/]).*/
     }
 
     this.middleware = {
@@ -109,7 +109,8 @@ export default class Sandbox {
    */
   require (_module: string) {
     const sandbox = this.box
-    const relativePath = path.relative(this.root, _module)
+    const fullPath = _module[0] === '/' ? _module : path.join(this.root, _module)
+    const relativePath = path.relative(this.root, fullPath)
     const middleware = this.middleware
 
     // Checks if module is unsafe
