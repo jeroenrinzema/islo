@@ -1,6 +1,6 @@
 {
   "name": "islo",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Run modules in a sandbox environment",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

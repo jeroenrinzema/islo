@@ -66,7 +66,8 @@ class Sandbox {
      */
     require(_module) {
         const sandbox = this.box;
-        const fullPath = _module[0] === '/' ? _module : path.join(this.root, _module);
+        const dirname = path.dirname(this.box.filename);
+        const fullPath = _module[0] === '/' ? _module : path.join(dirname, _module);
         const relativePath = path.relative(this.root, fullPath);
         const middleware = this.middleware;
         // Checks if module is unsafe
@@ -109,7 +110,7 @@ class Sandbox {
         const box = new Sandbox(_module, {
             root: this.root,
             blacklist: this.blacklist,
-            parent: Module.parent,
+            parent: Module,
             middleware: this.middleware
         });
         box.run();
