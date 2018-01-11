@@ -35,7 +35,7 @@ class Sandbox {
         this.parent = parent;
         this.file = file;
         this.root = options.root || path.dirname(file);
-        this._emitter = new EventEmitter();
+        this._emitter = options.emitter || new EventEmitter();
     }
     /**
      * Require the initialized module and run it inside of a sandbox.
@@ -111,7 +111,8 @@ class Sandbox {
             root: this.root,
             blacklist: this.blacklist,
             parent: Module,
-            middleware: this.middleware
+            middleware: this.middleware,
+            emitter: this._emitter
         });
         box.run();
         return box.exports;

@@ -13,7 +13,8 @@ export interface SandboxOptions {
   middleware?: {
     isSafe?: Function,
     require?: Function
-  }
+  },
+  emitter?: EventEmitter
 }
 
 export default class Sandbox {
@@ -76,7 +77,7 @@ export default class Sandbox {
     this.file = file
     this.root = options.root || path.dirname(file)
 
-    this._emitter = new EventEmitter()
+    this._emitter = options.emitter || new EventEmitter()
   }
   /**
    * Require the initialized module and run it inside of a sandbox.
@@ -163,7 +164,8 @@ export default class Sandbox {
       root: this.root,
       blacklist: this.blacklist,
       parent: Module,
-      middleware: this.middleware
+      middleware: this.middleware,
+      emitter: this._emitter
     })
 
     box.run()

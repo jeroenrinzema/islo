@@ -12,6 +12,7 @@ export interface SandboxOptions {
         isSafe?: Function;
         require?: Function;
     };
+    emitter?: EventEmitter;
 }
 export default class Sandbox {
     blacklist: Array<string>;
