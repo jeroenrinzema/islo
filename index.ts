@@ -1,5 +1,4 @@
 import * as path from 'path'
-import * as EventEmitter from 'events'
 import Module = require('module')
 
 export interface ExtendedModule extends Module {
@@ -13,8 +12,7 @@ export interface SandboxOptions {
   middleware?: {
     isSafe?: Function,
     require?: Function
-  },
-  emitter?: EventEmitter
+  }
 }
 
 export default class Sandbox {
@@ -33,8 +31,6 @@ export default class Sandbox {
   parent: NodeModule['parent']
   file: string
   root: string
-
-  _emitter: EventEmitter
 
   originalRequire: NodeRequireFunction
   box: Module
@@ -76,29 +72,23 @@ export default class Sandbox {
     this.parent = parent
     this.file = file
     this.root = options.root || path.dirname(file)
-
-    this._emitter = options.emitter || new EventEmitter()
   }
   /**
    * Require the initialized module and run it inside of a sandbox.
    * When a error is thrown will the 'error' event be emitted.
    */
   run () {
-    try {
-      // The node types for Module are not 100% accurate
-      const sandbox = <ExtendedModule>new Module(this.file, <Module>this.parent)
+    // The node types for Module are not 100% accurate
+    const sandbox = <ExtendedModule>new Module(this.file, <Module>this.parent)
 
-      this.originalRequire = sandbox.require
-      this.box = sandbox
+    this.originalRequire = sandbox.require
+    this.box = sandbox
 
-      sandbox.require = this.require.bind(this)
-      // Typescript thinks load does not exists on a Module
-      sandbox.load(sandbox.id)
+    sandbox.require = this.require.bind(this)
+    // Typescript thinks load does not exists on a Module
+    sandbox.load(sandbox.id)
 
-      this.exports = sandbox.exports
-    } catch (error) {
-      this.emit('error', error)
-    }
+    this.exports = sandbox.exports
   }
   /**
    * Require the given module and create a new sandbox.
@@ -164,18 +154,11 @@ export default class Sandbox {
       root: this.root,
       blacklist: this.blacklist,
       parent: Module,
-      middleware: this.middleware,
-      emitter: this._emitter
+      middleware: this.middleware
     })
 
     box.run()
 
     return box.exports
-  }
-  on (event: string, callback: Function) {
-    this._emitter.on.call(this._emitter, event, callback)
-  }
-  emit (event: string, ...args: Array<any>) {
-    this._emitter.emit(event, ...args)
   }
 }

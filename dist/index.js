@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
-const EventEmitter = require("events");
 const Module = require("module");
 class Sandbox {
     /**
@@ -35,26 +34,20 @@ class Sandbox {
         this.parent = parent;
         this.file = file;
         this.root = options.root || path.dirname(file);
-        this._emitter = options.emitter || new EventEmitter();
     }
     /**
      * Require the initialized module and run it inside of a sandbox.
      * When a error is thrown will the 'error' event be emitted.
      */
     run() {
-        try {
-            // The node types for Module are not 100% accurate
-            const sandbox = new Module(this.file, this.parent);
-            this.originalRequire = sandbox.require;
-            this.box = sandbox;
-            sandbox.require = this.require.bind(this);
-            // Typescript thinks load does not exists on a Module
-            sandbox.load(sandbox.id);
-            this.exports = sandbox.exports;
-        }
-        catch (error) {
-            this.emit('error', error);
-        }
+        // The node types for Module are not 100% accurate
+        const sandbox = new Module(this.file, this.parent);
+        this.originalRequire = sandbox.require;
+        this.box = sandbox;
+        sandbox.require = this.require.bind(this);
+        // Typescript thinks load does not exists on a Module
+        sandbox.load(sandbox.id);
+        this.exports = sandbox.exports;
     }
     /**
      * Require the given module and create a new sandbox.
@@ -111,17 +104,10 @@ class Sandbox {
             root: this.root,
             blacklist: this.blacklist,
             parent: Module,
-            middleware: this.middleware,
-            emitter: this._emitter
+            middleware: this.middleware
         });
         box.run();
         return box.exports;
-    }
-    on(event, callback) {
-        this._emitter.on.call(this._emitter, event, callback);
-    }
-    emit(event, ...args) {
-        this._emitter.emit(event, ...args);
     }
 }
 exports.default = Sandbox;

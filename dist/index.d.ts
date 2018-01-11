@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import * as EventEmitter from 'events';
 import Module = require('module');
 export interface ExtendedModule extends Module {
     load: Function;
@@ -12,7 +11,6 @@ export interface SandboxOptions {
         isSafe?: Function;
         require?: Function;
     };
-    emitter?: EventEmitter;
 }
 export default class Sandbox {
     blacklist: Array<string>;
@@ -27,7 +25,6 @@ export default class Sandbox {
     parent: NodeModule['parent'];
     file: string;
     root: string;
-    _emitter: EventEmitter;
     originalRequire: NodeRequireFunction;
     box: Module;
     exports: any;
@@ -66,6 +63,4 @@ export default class Sandbox {
      * @return {Object}           The exported object that the module returns.
      */
     wrap(_module: string, Module?: Module): any;
-    on(event: string, callback: Function): void;
-    emit(event: string, ...args: Array<any>): void;
 }
