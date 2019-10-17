@@ -2,14 +2,14 @@
 
 # Islo 🚧
 
-Require modules in a sandbox environment. Modules are unable to require blacklisted modules and / or files outside of it's root. Islo does not require any dependencies.
+Require modules in a sandbox environment. Modules are unable to require blacklisted modules and/or files outside of its root. Islo does not require any dependencies.
 
 ### Installation
 
 Using npm:
 
 ```
-$ npm i --save islo
+$ npm I --save islo
 ```
 
 ### Example
@@ -32,11 +32,11 @@ box.run()
 - `pathToModule` _(String)_
 - `options` _(Object)_
   - `key` _(String)_ Path to the root folder of the given module. By default is the file directory of the module used.
-  - `blacklist` _(Array)_ If the module tries to require one of blacklisted modules will a error be thrown.
+  - `blacklist` _(Array)_ If the module tries to require one of the blacklisted modules will an error be thrown.
   - `middleware` _(Object)_ See the documentation about middleware for more information.
 - **Returns** `Box`
 
-Create a new sandbox environment for the given module. By default is the module allowed to require any module but not any path outside of it's root.
+Create a new sandbox environment for the given module. By default is the module allowed to require any module but not any path outside of its root.
 
 ### box.on(eventName, callback)
 
@@ -58,4 +58,4 @@ Register a new handler for the given event. The callback function is called when
 
 |event|description|
 |-|-|
-|error|A fatal error has occured when trying to execute the module. This can be caused because the module tried to require a blacklisted or unsafe module.|
+|error|A fatal error has occurred when trying to execute the module. This can be caused because the module tried to require a blacklisted or unsafe module.|
